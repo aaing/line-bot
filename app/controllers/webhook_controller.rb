@@ -5,9 +5,6 @@ class WebhookController < ApplicationController
   OUTBOUND_PROXY = ENV['OUTBOUND_PROXY']
   CHANNEL_ACCESS_TOKEN = ENV['CHANNEL_ACCESS_TOKEN']
 
-  def index
-  end
-  
   def callback
     unless is_validate_signature
       render :nothing => true, status: 470
