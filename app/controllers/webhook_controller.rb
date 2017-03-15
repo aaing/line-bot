@@ -14,7 +14,7 @@ class WebhookController < ApplicationController
     render :nothing => true, status: :ok
   end
 
-  private
+  
   def reply(params)
 
     event = params["events"][0]
@@ -22,7 +22,7 @@ class WebhookController < ApplicationController
     input_text = (event["message"]["text"] if event_type == Constants::EVENT_TYPE_MESSAGE) || ''
     reply_token = event["replyToken"]
     response_text = input_text
-    
+
 
     # response_service = response_service(params)
     # response_text, reply_token  = response_service.form_response
