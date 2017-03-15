@@ -20,6 +20,10 @@ class WebhookController < ApplicationController
     line_client.reply(reply_token, response_text)  if response_text.present?
   end
 
+  def response_service(input_text)
+    ResponseService.new(input_text)
+  end
+
   def line_client
     @line_client ||= LineClient.new
   end
