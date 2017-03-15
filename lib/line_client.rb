@@ -1,44 +1,33 @@
+require 'line/bot'
+
 class LineClient
-  END_POINT = "https://api.line.me"
+  CHANNEL_SECRET = ENV['CHANNEL_SECRET']
+  CHANNEL_ACCESS_TOKEN = ENV['CHANNEL_ACCESS_TOKEN']
+  PUSH_TO_ID = ENV['PUSH_TO_ID']
 
-  def initialize(channel_access_token, proxy = nil)
-    @channel_access_token = channel_access_token
-    @proxy = proxy
-  end
+  attr_reader :client
 
-  def post(path, data)
-    client = Faraday.new(:url => END_POINT) do |conn|
-      conn.request :json
-      conn.response :json, :content_type => /\bjson$/
-      conn.adapter Faraday.default_adapter
-      conn.proxy @proxy
-    end
-
-    res = client.post do |request|
-      request.url path
-      request.headers = {
-        'Content-type' => 'application/json',
-        'Authorization' => "Bearer #{@channel_access_token}"
-      }
-      request.body = data
-    end
-    res
-  end
-
-  def reply(replyToken, text)
-
-    messages = [
-      {
-        "type" => "text" ,
-        "text" => text
-      }
-    ]
-
-    body = {
-      "replyToken" => replyToken ,
-      "messages" => messages
+  def initialize
+    @client ||= Line::Bot::Client.new { |config|
+      config.channel_secret = CHANNEL_SECRET
+      config.channel_token = CHANNEL_ACCESS_TOKEN
     }
-    post('/v2/bot/message/reply', body.to_json)
   end
 
+  def reply(reply_token, message)
+    client.reply_message(reply_token, text_message(message))
+  end
+
+  def push(message)
+    client.push_message(PUSH_TO_ID, text_message(message))
+  end
+
+  private
+
+  def text_message(text)
+    {
+        "type" => "text",
+        "text" => text
+    }
+  end
 end
