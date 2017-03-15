@@ -1,3 +1,5 @@
+require_relative '../../config/initializers/constants'
+
 class WebhookController < ApplicationController
   protect_from_forgery with: :null_session
 
@@ -14,8 +16,15 @@ class WebhookController < ApplicationController
 
   private
   def reply(params)
-    response_service = response_service(params)
-    response_text, reply_token  = response_service.form_response
+
+    event = params["events"][0]
+    event_type = event["type"]
+    input_text = (event["message"]["text"] if event_type == Constants::EVENT_TYPE_MESSAGE) || ''
+    reply_token = event["replyToken"]
+    response_text = input_text
+
+    # response_service = response_service(params)
+    # response_text, reply_token  = response_service.form_response
 
     line_client.reply(reply_token, response_text)  if response_text.present?
   end
